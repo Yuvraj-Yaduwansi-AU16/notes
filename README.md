@@ -1,29 +1,85 @@
-# Create T3 App
+# Task Management App
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+A modern task management application built with the T3 Stack, featuring task creation, assignment, and tracking capabilities.
 
-## What's next? How do I make an app with this?
+## Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- 🔐 Authentication with NextAuth.js (Email/Password & Google OAuth)
+- 📝 Create, update, and delete tasks
+- 👥 Assign tasks to team members
+- 🏷️ Tag-based task organization
+- 📊 Task status tracking (TODO, IN_PROGRESS, REVIEW, DONE)
+- ⚡ Priority levels (LOW, MEDIUM, HIGH, URGENT)
+- 📅 Due date management
+- 👤 User profiles and management
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Tech Stack
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- [Next.js](https://nextjs.org) - React framework for server-rendered applications
+- [NextAuth.js](https://next-auth.js.org) - Authentication with Supabase Auth integration
+- [Prisma](https://prisma.io) - Database ORM with PostgreSQL
+- [tRPC](https://trpc.io) - End-to-end typesafe APIs
+- [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS framework
+- [shadcn/ui](https://ui.shadcn.com) - Re-usable components built with Radix UI
+- [Supabase](https://supabase.com) - Authentication and database services
 
-## Learn More
+## Getting Started
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up environment variables:
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+   ```env
+   DATABASE_URL="your_postgresql_url"
+   NEXTAUTH_SECRET="your_nextauth_secret"
+   NEXTAUTH_URL="http://localhost:3000"
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+   # Supabase
+   NEXT_PUBLIC_SUPABASE_URL="your_supabase_url"
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="your_supabase_anon_key"
 
-## How do I deploy this?
+   # Google OAuth
+   AUTH_GOOGLE_ID="your_google_client_id"
+   AUTH_GOOGLE_SECRET="your_google_client_secret"
+   ```
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+## Database Schema
+
+The application uses the following main tables:
+
+- `User` - User profiles and authentication
+- `Task` - Task management with status and priority
+- `Tag` - Task categorization
+- `TaskAssignment` - Task assignments to users
+- `TaskTag` - Many-to-many relationship between tasks and tags
+
+## Authentication Flow
+
+1. Email/Password:
+
+   - User signs up with email and password
+   - Account created in Supabase Auth
+   - User profile created in Prisma database
+   - NextAuth session established
+
+2. Google OAuth:
+   - User signs in with Google
+   - Account created in Supabase Auth
+   - User profile created in Prisma database
+   - NextAuth session established
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
