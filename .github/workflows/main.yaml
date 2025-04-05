@@ -47,6 +47,11 @@ jobs:
       - name: Set SST Config Secret
         run: npx sst secrets set COMMIT_SHA '${{ github.sha }}' --stage production
 
+      - name: Inject DATABASE_URL and DIRECT_URL into ENV
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> $GITHUB_ENV
+
       - name: Run Database Migrations
         run: npx prisma migrate deploy
 
