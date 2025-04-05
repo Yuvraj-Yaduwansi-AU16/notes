@@ -1,0 +1,58 @@
+name: Deploy via SST to AWS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - sst.config.ts
+      - src/**
+      - .github/workflows/**
+      - prisma/**
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Cache Next.js build
+        uses: actions/cache@v3
+        with:
+          path: |
+            .next
+            .sst
+          key: cache-${{ hashFiles('**/package-lock.json') }}-next-${{ hashFiles('**.[jt]s','**/*.tsx') }}
+          restore-keys: |
+            cache-${{ hashFiles('**/package-lock.json') }}-next-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Install AWS Creds
+        run: |
+          mkdir -p ~/.aws
+          echo "[default]" > ~/.aws/credentials
+          echo "aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+          echo "aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+          echo "aws_region = us-east-1" >> ~/.aws/credentials
+
+      - name: Set SST Config Secret
+        run: npx sst secret set COMMIT_SHA '${{ github.sha }}' --stage production
+
+      - name: Run Database Migrations
+        run: npx prisma migrate deploy
+
+      - name: Deploy to Production
+        run: npm run deploy
+
+      - name: Clean up
+        run: |
+          rm -rf ~/.aws
