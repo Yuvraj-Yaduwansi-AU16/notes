@@ -18,9 +18,10 @@ export default {
       const NEXT_PUBLIC_SUPABASE_ANON_KEY = new Config.Secret(stack, "NEXT_PUBLIC_SUPABASE_ANON_KEY");
       const DATABASE_URL = new Config.Secret(stack, "DATABASE_URL");
       const DIRECT_URL = new Config.Secret(stack, "DIRECT_URL");
+      const NEXTAUTH_URL = new Config.Secret(stack, "NEXTAUTH_URL");
       const site = new NextjsSite(stack, "NextSite", {
         path: ".",
-        bind: [SECRET_KEY, AUTH_SECRET, AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, DATABASE_URL, DIRECT_URL],
+        bind: [SECRET_KEY, AUTH_SECRET, AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, DATABASE_URL, DIRECT_URL, NEXTAUTH_URL],
       });
 
       stack.addOutputs({
