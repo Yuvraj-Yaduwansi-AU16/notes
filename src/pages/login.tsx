@@ -58,7 +58,7 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     try {
       await signIn("google", {
-        callbackUrl: "/tasks",
+        callbackUrl: "/",
         redirect: true,
       });
     } catch (err) {

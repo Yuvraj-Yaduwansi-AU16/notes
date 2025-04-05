@@ -51,17 +51,17 @@ model Session {
 }
 
 model User {
-    id            String           @id @default(cuid())
-    supabaseId    String?          @unique
-    name          String?
-    email         String?          @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    profile       UserProfile?
-    assignedTasks TaskAssignment[]
-    createdTasks  Task[]           @relation("TaskCreator")
+    id              String           @id @default(cuid())
+    supabaseId      String?          @unique
+    name            String?
+    email           String?          @unique
+    emailVerified   DateTime?
+    image           String?
+    accounts        Account[]
+    sessions        Session[]
+    profile         UserProfile?
+    assignedTasks   TaskAssignment[]
+    createdProjects Project[]        @relation("ProjectCreator")
 }
 
 model VerificationToken {
@@ -82,6 +82,20 @@ model UserProfile {
     updatedAt   DateTime @updatedAt
 }
 
+model Project {
+    id          String        @id @default(cuid())
+    name        String
+    description String?       @db.Text
+    status      ProjectStatus @default(ACTIVE)
+    startDate   DateTime?
+    endDate     DateTime?
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+    creatorId   String
+    creator     User          @relation("ProjectCreator", fields: [creatorId], references: [id])
+    tasks       Task[]
+}
+
 model Task {
     id          String           @id @default(cuid())
     title       String
@@ -91,8 +105,8 @@ model Task {
     dueDate     DateTime?
     createdAt   DateTime         @default(now())
     updatedAt   DateTime         @updatedAt
-    creatorId   String
-    creator     User             @relation("TaskCreator", fields: [creatorId], references: [id])
+    projectId   String           @default("default-project")
+    project     Project          @relation(fields: [projectId], references: [id])
     assignments TaskAssignment[]
     tags        Tag[]
 }
@@ -130,4 +144,10 @@ enum Priority {
     MEDIUM
     HIGH
     URGENT
+}
+
+enum ProjectStatus {
+    ACTIVE
+    COMPLETED
+    ARCHIVED
 }

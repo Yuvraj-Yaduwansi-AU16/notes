@@ -15,10 +15,9 @@ import {
 } from "~/components/ui/select";
 import { Label } from "~/components/ui/label";
 import { toast } from "sonner";
-import { AddMembersModal } from "~/components/tasks/AddMembersModal";
-import { DeleteTaskModal } from "~/components/tasks/DeleteTaskModal";
-import { EditMembersModal } from "~/components/tasks/EditMembersModal";
 import Header from "~/components/Header";
+import { useSession } from "next-auth/react";
+import { type Session } from "next-auth";
 
 interface FormData {
   title: string;
@@ -35,30 +34,35 @@ interface Task {
   status: "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE";
   priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   dueDate: Date | null;
-  creator: {
-    name: string | null;
-  };
-  creatorId: string;
-  tags: Array<{
-    id: string;
+  project: {
     name: string;
-    color: string | null;
-  }>;
+    creator: {
+      id: string;
+      name: string | null;
+    };
+  };
   assignments: Array<{
     id: string;
-    name: string;
+    taskId: string;
+    userId: string;
+    assignedAt: Date;
+    completedAt: Date | null;
     user: {
       id: string;
       name: string | null;
     };
+  }>;
+  tags: Array<{
+    id: string;
+    name: string;
+    color: string | null;
   }>;
 }
 
 export default function EditTaskPage() {
   const router = useRouter();
   const { id } = router.query;
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isEditMembersModalOpen, setIsEditMembersModalOpen] = useState(false);
+  const { data: session } = useSession() as { data: Session | null };
   const [formData, setFormData] = useState<FormData>({
     title: "",
     description: "",
@@ -66,9 +70,6 @@ export default function EditTaskPage() {
     priority: "MEDIUM",
     dueDate: "",
   });
-  const [assignments, setAssignments] = useState<
-    { userId: string; name: string }[]
-  >([]);
 
   const { data: task, isLoading: isLoadingTask } = api.task.listOne.useQuery(
     id as string,
@@ -77,9 +78,12 @@ export default function EditTaskPage() {
     },
   );
 
+  const { data: currentUser } = api.user.getUser.useQuery(undefined, {
+    enabled: !!session?.user?.id,
+  });
+
   useEffect(() => {
     if (task) {
-      console.log(task, "task");
       setFormData({
         title: task.title,
         description: task.description ?? "",
@@ -89,49 +93,26 @@ export default function EditTaskPage() {
           ? new Date(task.dueDate).toISOString().slice(0, 16)
           : "",
       });
-      setAssignments(
-        task.assignments.map((assignment) => ({
-          userId: assignment.user.id,
-          name: assignment.user.name ?? "",
-        })),
-      );
     }
   }, [task]);
 
   const updateTask = api.task.update.useMutation({
     onSuccess: () => {
       toast.success("Task updated successfully!");
-      void router.push("/");
+      void router.push("/tasks/assigned");
     },
     onError: (error) => {
       toast.error(error.message ?? "An unexpected error occurred");
     },
   });
 
-  const deleteTask = api.task.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Task deleted successfully!");
-    },
-    onError: () => {
-      toast.error("An unexpected error occurred");
-    },
-  });
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!id) return;
-    const x = {
-      id: id as string,
-      ...formData,
-      dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
-      assignments: assignments.map((a) => a.userId),
-    };
-    console.log(x, "xxxxx");
     updateTask.mutate({
       id: id as string,
       ...formData,
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
-      assignments: assignments.map((a) => a.userId),
     });
   };
 
@@ -168,25 +149,44 @@ export default function EditTaskPage() {
     return (
       <div className="container mx-auto max-w-2xl py-8">
         <h1 className="text-2xl font-bold text-red-500">Task not found</h1>
-        <Button className="mt-4" onClick={() => void router.push("/")}>
+        <Button
+          className="mt-4"
+          onClick={() => void router.push("/tasks/assigned")}
+        >
           Back to Tasks
         </Button>
       </div>
     );
   }
 
+  const taskData = task as unknown as Task;
+  const isAssigned = taskData.assignments.some(
+    (assignment) => assignment.user.id === currentUser?.id,
+  );
+
+  // if (!isAssigned) {
+  //   return (
+  //     <div className="container mx-auto max-w-2xl py-8">
+  //       <h1 className="text-2xl font-bold text-red-500">Access Denied</h1>
+  //       <p className="mt-2 text-gray-600">
+  //         You are not assigned to this task and cannot edit it.
+  //       </p>
+  //       <Button
+  //         className="mt-4"
+  //         onClick={() => void router.push("/tasks/assigned")}
+  //       >
+  //         Back to Tasks
+  //       </Button>
+  //     </div>
+  //   );
+  // }
+
   return (
     <>
       <Header />
       <div className="container mx-auto max-w-2xl py-8">
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8">
           <h1 className="text-2xl font-bold">Edit Task</h1>
-          <Button
-            variant="outline"
-            onClick={() => setIsEditMembersModalOpen(true)}
-          >
-            Edit Members
-          </Button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
@@ -270,7 +270,7 @@ export default function EditTaskPage() {
               type="button"
               variant="outline"
               className="flex-1"
-              onClick={() => void router.push("/")}
+              onClick={() => void router.push("/tasks/assigned")}
             >
               Cancel
             </Button>
@@ -282,45 +282,7 @@ export default function EditTaskPage() {
               {updateTask.isPending ? "Updating..." : "Update Task"}
             </Button>
           </div>
-          <Button
-            className="flex-1 bg-red-700 hover:bg-red-700"
-            onClick={(e) => {
-              e.preventDefault();
-              setIsDeleteModalOpen(true);
-            }}
-          >
-            Delete Task
-          </Button>
         </form>
-        {isDeleteModalOpen && (
-          <DeleteTaskModal
-            isOpen={isDeleteModalOpen}
-            onClose={() => setIsDeleteModalOpen(false)}
-            onConfirm={async () => {
-              try {
-                const success = await deleteTask.mutateAsync(task.id);
-                if (success) {
-                  await router.push("/");
-                }
-              } catch (error) {
-                console.error("Error deleting task:", error);
-                toast.error("Failed to delete task. Please try again.");
-              }
-            }}
-            title="Delete Task"
-            description="Are you sure you want to delete this task? This action cannot be undone."
-          />
-        )}
-        {isEditMembersModalOpen && (
-          <EditMembersModal
-            isOpen={isEditMembersModalOpen}
-            onClose={() => setIsEditMembersModalOpen(false)}
-            taskId={task.id}
-            task={task}
-            currentAssignments={assignments}
-            onAssignmentsChange={setAssignments}
-          />
-        )}
       </div>
     </>
   );

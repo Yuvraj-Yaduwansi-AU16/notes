@@ -45,6 +45,10 @@ export function EditMembersModal({
     name?: string;
   } | null>(null);
 
+  const { data: currentUser } = api.user.getUser.useQuery(undefined, {
+    enabled: !!session?.user?.id,
+  });
+
   const { data: userData, isLoading: isLoadingUsers } = api.user.list.useQuery(
     { search, page, limit },
     { enabled: isOpen },
@@ -85,7 +89,7 @@ export function EditMembersModal({
     },
   });
 
-  const handleAddUser = (user: { id: string; name: string | null }) => {
+  const handleAddUser = async (user: { id: string; name: string | null }) => {
     if (currentAssignments.some((a) => a.userId === user.id)) {
       toast.error("User is already assigned to this task");
       return;
@@ -95,34 +99,42 @@ export function EditMembersModal({
       return;
     }
 
-    // Store the action for potential rollback
-    setLastAction({ type: "add", userId: user.id });
+    try {
+      // Only call API if task exists in database
+      if (task.id) {
+        await assignTask.mutateAsync({
+          taskId,
+          userId: user.id,
+        });
+      }
 
-    // Optimistic update
-    onAssignmentsChange([
-      ...currentAssignments,
-      { userId: user.id, name: user.name ?? "" },
-    ]);
-
-    // Make the API call
-    assignTask.mutate({
-      taskId,
-      userId: user.id,
-    });
+      // Update UI state in both cases
+      onAssignmentsChange([
+        ...currentAssignments,
+        { userId: user.id, name: user.name ?? "" },
+      ]);
+    } catch (error) {
+      console.error("Failed to assign user:", error);
+    }
   };
 
-  const handleRemoveUser = (userId: string, name: string) => {
-    // Store the action for potential rollback
-    setLastAction({ type: "remove", userId, name });
+  const handleRemoveUser = async (userId: string, name: string) => {
+    try {
+      // Only call API if task exists in database
+      if (task.id) {
+        await removeAssign.mutateAsync({
+          taskId,
+          userId,
+        });
+      }
 
-    // Optimistic update
-    onAssignmentsChange(currentAssignments.filter((a) => a.userId !== userId));
-
-    // Make the API call
-    removeAssign.mutate({
-      taskId,
-      userId,
-    });
+      // Update UI state in both cases
+      onAssignmentsChange(
+        currentAssignments.filter((a) => a.userId !== userId),
+      );
+    } catch (error) {
+      console.error("Failed to remove user:", error);
+    }
   };
 
   return (
@@ -152,7 +164,7 @@ export function EditMembersModal({
                 const isAssigned = currentAssignments.some(
                   (a) => a.userId === user.id,
                 );
-                const isCurrentUser = user.id === session?.user.id;
+                const isCurrentUser = user.id === currentUser?.id;
 
                 return (
                   <div
@@ -163,7 +175,7 @@ export function EditMembersModal({
                       <p className="font-medium">{user.name}</p>
                       <p className="text-sm text-gray-500">{user.email}</p>
                     </div>
-                    {!isCurrentUser && user.id !== task.creatorId && (
+                    {!isCurrentUser && (
                       <Button
                         variant={isAssigned ? "destructive" : "default"}
                         size="sm"

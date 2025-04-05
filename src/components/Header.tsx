@@ -25,13 +25,13 @@ const Header = () => {
               href="/"
               className="text-xl font-bold text-gray-900 hover:text-gray-700"
             >
-              Task Manager
+              Project Manager
             </Link>
             <div className="ml-10 flex items-center space-x-4">
               <Link
-                href="/tasks"
+                href="/tasks/assigned"
                 className={`rounded-md px-3 py-2 text-sm font-medium ${
-                  router.pathname === "/tasks"
+                  router.pathname === "/tasks/assigned"
                     ? "bg-gray-100 text-gray-900"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
@@ -40,14 +40,14 @@ const Header = () => {
               </Link>
               {session && (
                 <Link
-                  href="/tasks/create"
+                  href="/project/create"
                   className={`rounded-md px-3 py-2 text-sm font-medium ${
-                    router.pathname === "/tasks/create"
+                    router.pathname === "/project/create"
                       ? "bg-gray-100 text-gray-900"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
                 >
-                  Add Task
+                  Add Project
                 </Link>
               )}
             </div>

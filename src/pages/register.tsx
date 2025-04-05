@@ -106,7 +106,7 @@ export default function Register() {
 
       // If we get here, everything succeeded
       toast.success("Registration successful!");
-      void router.push("/tasks");
+      void router.push("/");
     } catch (err) {
       console.error("Registration error:", err);
       setError(
