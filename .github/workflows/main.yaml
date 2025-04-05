@@ -45,7 +45,7 @@ jobs:
           echo "aws_region = us-east-1" >> ~/.aws/credentials
 
       - name: Set SST Config Secret
-        run: npx sst secret set COMMIT_SHA '${{ github.sha }}' --stage production
+        run: npx sst secrets set COMMIT_SHA '${{ github.sha }}' --stage production
 
       - name: Run Database Migrations
         run: npx prisma migrate deploy
