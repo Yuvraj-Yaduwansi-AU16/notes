@@ -12,7 +12,7 @@ export const env = createEnv({
         ? z.string()
         : z.string().optional(),
     AUTH_GOOGLE_ID: z.string(),
-    SECRET_VAL: z.string(),
+    SECRET_VAL: z.string().optional(),
     AUTH_GOOGLE_SECRET: z.string(),
     DATABASE_URL: z.string().url(),
     DIRECT_URL: z.string().url(),
