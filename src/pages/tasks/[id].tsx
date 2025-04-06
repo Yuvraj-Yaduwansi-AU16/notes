@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import Header from "~/components/Header";
 import { useSession } from "next-auth/react";
 import { type Session } from "next-auth";
-
+import { ErrorPage } from "~/components/ui/error-page";
 interface FormData {
   title: string;
   description: string;
@@ -146,23 +146,13 @@ export default function EditTaskPage() {
   }
 
   if (!task) {
-    return (
-      <div className="container mx-auto max-w-2xl py-8">
-        <h1 className="text-2xl font-bold text-red-500">Task not found</h1>
-        <Button
-          className="mt-4"
-          onClick={() => void router.push("/tasks/assigned")}
-        >
-          Back to Tasks
-        </Button>
-      </div>
-    );
+    return <ErrorPage message="Failed to load task" />;
   }
 
-  const taskData = task as unknown as Task;
-  const isAssigned = taskData.assignments.some(
-    (assignment) => assignment.user.id === currentUser?.id,
-  );
+  // const taskData = task as unknown as Task;
+  // const isAssigned = taskData.assignments.some(
+  //   (assignment) => assignment.user.id === currentUser?.id,
+  // );
 
   // if (!isAssigned) {
   //   return (

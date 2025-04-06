@@ -65,13 +65,15 @@ const ProjectsPage = () => {
               Manage and track your projects in one place
             </p>
           </div>
-          <Button
-            onClick={() => void router.push("/project/create")}
-            className="h-11 px-6"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            New Project
-          </Button>
+          {projects?.length !== 0 && (
+            <Button
+              onClick={() => void router.push("/project/create")}
+              className="h-11 px-6"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              New Project
+            </Button>
+          )}
         </div>
 
         {projects?.length === 0 ? (

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { signIn, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
@@ -37,6 +39,22 @@ export default function Login() {
     setIsLoading(true);
 
     try {
+      // 1. Check if user exists
+      const res = await fetch("/api/auth/check-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!data.exists) {
+        setError("No account found with this email. Please sign up.");
+        setIsLoading(false);
+        return;
+      }
+
+      // 2. Proceed with login
       const result = await signIn("credentials", {
         email,
         password,

@@ -17,6 +17,8 @@ import {
 } from "~/components/ui/dialog";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { LoadingPage } from "~/components/ui/loading-page";
+import { ErrorPage } from "~/components/ui/error-page";
 
 interface EditFormData {
   name: string;
@@ -75,26 +77,13 @@ export default function ProfilePage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="border-primary mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
-          <p>Loading profile...</p>
-        </div>
-      </div>
-    );
+    return <LoadingPage message="Loading profile..." />;
   }
 
   const displayUser = user ?? session?.user;
 
   if (!displayUser) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500">Failed to load profile</p>
-        </div>
-      </div>
-    );
+    return <ErrorPage message="Failed to load profile" />;
   }
 
   return (

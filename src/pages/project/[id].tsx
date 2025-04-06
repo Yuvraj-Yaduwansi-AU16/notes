@@ -33,7 +33,8 @@ import { EditMembersModal } from "~/components/tasks/EditMembersModal";
 import { DeleteTaskModal } from "~/components/tasks/DeleteTaskModal";
 import type { Task } from "@prisma/client";
 import Header from "~/components/Header";
-
+import { LoadingPage } from "~/components/ui/loading-page";
+import { ErrorPage } from "~/components/ui/error-page";
 type Project = RouterOutputs["project"]["listOne"];
 // type Task = RouterOutputs["project"]["listOne"]["tasks"][number];
 type User = RouterOutputs["user"]["list"]["users"][number];
@@ -235,11 +236,11 @@ const ProjectPage = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingPage message="Loading project..." />;
   }
 
   if (!project) {
-    return <div>Project not found</div>;
+    return <ErrorPage message="Failed to load project" />;
   }
 
   return (

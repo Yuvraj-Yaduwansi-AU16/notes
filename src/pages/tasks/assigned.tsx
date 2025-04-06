@@ -10,7 +10,7 @@ import {
 } from "~/components/ui/card";
 import { format } from "date-fns";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, PlusCircle } from "lucide-react";
 import { useRouter } from "next/router";
 import Header from "~/components/Header";
 
@@ -71,12 +71,6 @@ export default function AssignedTasksPage() {
         <div className="container mx-auto py-8">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">My Tasks</h1>
-            <Button asChild>
-              <Link href="/tasks/create">
-                <Plus className="mr-2 h-4 w-4" />
-                New Task
-              </Link>
-            </Button>
           </div>
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
@@ -105,14 +99,29 @@ export default function AssignedTasksPage() {
       <div className="container mx-auto px-5 py-8">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">My Tasks</h1>
-          <Button asChild>
-            <Link href="/tasks/create">
-              <Plus className="mr-2 h-4 w-4" />
-              New Task
-            </Link>
-          </Button>
         </div>
-
+        {typedTasks?.length === 0 && (
+          <div className="flex h-full flex-col items-center justify-center">
+            <div className="text-center">
+              <div className="bg-muted mx-auto mb-4 h-16 w-16 rounded-full p-3">
+                <PlusCircle className="text-muted-foreground h-full w-full" />
+              </div>
+              <h2 className="text-2xl font-semibold tracking-tight">
+                No tasks assigned yet
+              </h2>
+              <p className="text-muted-foreground mt-2 max-w-md">
+                Create projects with tasks to track them here. Get started by
+                creating your first project.
+              </p>
+              <Button
+                className="mt-6"
+                onClick={() => void router.push("/project/create")}
+              >
+                Create Project
+              </Button>
+            </div>
+          </div>
+        )}
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {typedTasks?.map((task) => (
             <Card

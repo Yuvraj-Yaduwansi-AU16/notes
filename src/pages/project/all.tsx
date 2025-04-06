@@ -9,7 +9,7 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/router";
 import { format } from "date-fns";
 import type { RouterOutputs } from "~/utils/api";
-
+import { LoadingPage } from "~/components/ui/loading-page";
 type Project = RouterOutputs["project"]["list"][number];
 
 const ProjectsPage = () => {
@@ -17,7 +17,7 @@ const ProjectsPage = () => {
   const { data: projects, isLoading } = api.project.list.useQuery();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingPage message="Loading projects..." />;
   }
 
   return (
