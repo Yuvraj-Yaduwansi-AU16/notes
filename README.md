@@ -1,17 +1,20 @@
-# Task Management App
+# Project Management App
 
-A modern task management application built with the T3 Stack, featuring task creation, assignment, and tracking capabilities.
+A modern project and task management application built with the T3 Stack, featuring project organization, task tracking, and team collaboration capabilities.
 
 ## Features
 
 - 🔐 Authentication with NextAuth.js (Email/Password & Google OAuth)
-- 📝 Create, update, and delete tasks
-- 👥 Assign tasks to team members
-- 🏷️ Tag-based task organization
-- 📊 Task status tracking (TODO, IN_PROGRESS, REVIEW, DONE)
-- ⚡ Priority levels (LOW, MEDIUM, HIGH, URGENT)
-- 📅 Due date management
-- 👤 User profiles and management
+- 📁 Project Management (Create, Read, Update, Delete)
+- 📝 Task Management within Projects
+- 👥 Team Collaboration and Member Management
+- 📊 Project and Task status tracking
+- ⚡ Priority levels for tasks (LOW, MEDIUM, HIGH, URGENT)
+- 📅 Due date management for projects and tasks
+- 👤 User profiles with role-based access
+- 🧪 Comprehensive test coverage with Jest
+- 🚀 Automated deployment with GitHub Actions
+- ☁️ AWS SSET for secure environment management
 
 ## Tech Stack
 
@@ -22,6 +25,9 @@ A modern task management application built with the T3 Stack, featuring task cre
 - [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS framework
 - [shadcn/ui](https://ui.shadcn.com) - Re-usable components built with Radix UI
 - [Supabase](https://supabase.com) - Authentication and database services
+- [Jest](https://jestjs.io) - Testing framework
+- [GitHub Actions](https://github.com/features/actions) - CI/CD automation
+- [AWS SSET](https://aws.amazon.com/systems-manager/features/parameter-store/) - Secure parameter storage
 
 ## Getting Started
 
@@ -51,14 +57,65 @@ A modern task management application built with the T3 Stack, featuring task cre
    npm run dev
    ```
 
+## Testing
+
+The application uses Jest for unit and integration testing. To run tests:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+
+```
+
+Tests are located in the `src/__tests__` directory and follow the naming pattern `*.test.tsx`.
+
+## Deployment
+
+The application is deployed using GitHub Actions and AWS SSET. Here's how it works:
+
+### GitHub Actions Workflow
+
+1. **Continuous Integration**:
+
+   - Runs on every push to main branch
+   - Executes test suite
+   - Builds the application
+   - Validates environment variables
+
+2. **Continuous Deployment**:
+   - Deploys to AWS on successful CI
+   - Uses AWS SSET for secure environment variables
+   - Automatically updates the production environment
+
+### AWS SSET Integration
+
+1. **Environment Variables**:
+
+   - All sensitive configuration is stored in AWS SSET
+   - Parameters are automatically injected during deployment
+   - Secure access through IAM roles
+
+2. **Deployment Process**:
+   - GitHub Actions workflow triggers on main branch updates
+   - AWS SSET parameters are fetched
+   - Application is built with production configuration
+   - Deployed to AWS infrastructure
+
 ## Database Schema
 
 The application uses the following main tables:
 
-- `User` - User profiles and authentication
-- `Task` - Task management with status and priority
-- `Tag` - Task categorization
-- `TaskAssignment` - Task assignments to users
+- `User` - User profiles, authentication, and role management
+- `Project` - Project management with status and team assignments
+- `Task` - Task management within projects
+- `ProjectMember` - Project team member assignments
+- `TaskAssignment` - Task assignments to team members
+- `Tag` - Project and task categorization
+- `ProjectTag` - Many-to-many relationship between projects and tags
 - `TaskTag` - Many-to-many relationship between tasks and tags
 
 ## Authentication Flow
@@ -75,6 +132,16 @@ The application uses the following main tables:
    - Account created in Supabase Auth
    - User profile created in Prisma database
    - NextAuth session established
+
+## User Profiles
+
+The application includes comprehensive user profile management:
+
+- Personal information management
+- Profile picture upload and management
+- Role-based access control
+- Project and task assignment history
+- Activity tracking and notifications
 
 ## Contributing
 

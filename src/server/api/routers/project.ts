@@ -6,7 +6,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { Prisma } from "@prisma/client";
-import { findUserBySessionId } from "./user";
+import { findUserBySessionId } from "~/utils/getUser";
 
 // Schema for project creation
 const createProjectSchema = z.object({

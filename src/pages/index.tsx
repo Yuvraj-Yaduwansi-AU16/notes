@@ -31,7 +31,11 @@ const ProjectsPage = () => {
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
+              <Card
+                key={i}
+                className="animate-pulse"
+                data-testid="project-card-skeleton"
+              >
                 <CardHeader>
                   <div className="h-6 w-3/4 rounded bg-gray-200" />
                 </CardHeader>
