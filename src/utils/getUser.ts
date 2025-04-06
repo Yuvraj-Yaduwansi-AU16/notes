@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 export async function findUserBySessionId(db: Prisma.TransactionClient, sessionId: string, email?: string) {
     try {
